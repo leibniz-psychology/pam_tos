@@ -1,0 +1,73 @@
+# These is pam_tos’ LDAP schema.
+
+# Using a Private Enterprise Number (PEN) from IANA.
+# Not for use by the general public! Please register your own here:
+# https://pen.iana.org/
+objectIdentifier zpidBase 1.3.6.1.4.1.57338
+objectIdentifier pamtosBase zpidBase:1.1
+objectIdentifier attrBase pamtosBase:1
+objectIdentifier classBase pamtosBase:2
+
+attributetype ( attrBase:1
+	NAME 'x-acceptedTermsEffective'
+	DESC 'The terms that were accepted'
+	EQUALITY generalizedTimeMatch
+	ORDERING generalizedTimeOrderingMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.24
+	SINGLE-VALUE )
+
+# Stored as Generalized time, see https://tools.ietf.org/html/rfc4517#section-3.3.13
+attributetype ( attrBase:2
+	NAME 'x-termsEffective'
+	DESC 'Date when these terms become effective'
+	EQUALITY generalizedTimeMatch
+	ORDERING generalizedTimeOrderingMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.24
+	SINGLE-VALUE )
+
+attributetype ( attrBase:3
+	NAME 'x-termsKind'
+	DESC 'Kind of terms (terms, privacy, …)'
+	EQUALITY caseIgnoreMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256}
+	SINGLE-VALUE )
+
+attributetype ( attrBase:4
+	NAME 'x-termsContent'
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{32768}
+	SINGLE-VALUE )
+
+attributetype ( attrBase:5
+	NAME 'x-termsId'
+	DESC 'Unique ID for the terms'
+	EQUALITY caseIgnoreMatch
+	ORDERING caseIgnoreOrderingMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256}
+	SINGLE-VALUE )
+
+# Stored as country string, see https://tools.ietf.org/html/rfc4517#section-3.3.4
+attributetype ( attrBase:6
+	NAME 'x-termsLanguage'
+	DESC 'Language of the content'
+	EQUALITY caseIgnoreMatch
+	ORDERING caseIgnoreOrderingMatch
+	SUBSTR caseIgnoreSubstringsMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.11
+	SINGLE-VALUE )
+
+objectclass ( classBase:1
+	NAME 'x-signatory'
+	DESC 'Entity that signed/accepted terms of conditions'
+	SUP top
+	AUXILIARY
+	MAY x-acceptedTermsEffective )
+
+objectclass ( classBase:2
+	NAME 'x-termsAndConditions'
+	DESC 'Revision of terms of services'
+	SUP top
+	MUST ( x-termsId $ x-termsEffective $ x-termsKind $ x-termsLanguage $ x-termsContent ) )
+
