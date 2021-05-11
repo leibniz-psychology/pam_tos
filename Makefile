@@ -1,4 +1,4 @@
-all: pam_tos.so test
+all: pam_tos.so
 
 PREFIX:=/
 SYSCONFDIR:=${PREFIX}/etc
